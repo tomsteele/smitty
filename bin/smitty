@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
-$:.unshift(File.join(File.dirname(__FILE__), "/../lib"))
-require "mail"
-require "docopt"
-require "nokogiri"
-require "premailer"
-require "smitty"
+$:.unshift(File.join(File.dirname(__FILE__), '/../lib'))
+require 'mail'
+require 'docopt'
+require 'nokogiri'
+require 'premailer'
+require 'smitty'
 
 doc = <<DOCOPT
 Smitty #{Smitty::VERSION}
@@ -53,10 +53,10 @@ begin
   smtp_conn = Net::SMTP.new(smtp_server, smtp_port)
   # Enable TLS
   smtp_conn.enable_tls() if args['--ssl']
-  # Use authentication exit if username provided by no password
+  # Use authentication exit if username provided but no password
   if args['--username']
     if args['--password'].nil?
-      puts 'Error no password provided'
+      puts 'Error: No password provided'
       exit(1)
     end
     smtp_conn.start(smtp_server, args['--username'], args['--password'], :plain)
@@ -67,7 +67,7 @@ begin
     delivery_method :smtp_connection, { :connection => smtp_conn }
   end
 rescue Exception => e
-  puts "Error connecting to SMTP server #{smtp_server}:#{smtp_port}"
+  puts "Error: Could not connect to SMTP server #{smtp_server}:#{smtp_port}"
   puts e.message
   exit(1)
 end
@@ -89,7 +89,7 @@ end
 begin
   template = Premailer.new(args['<template>'])
 rescue Errno::ENOENT => e
-  puts "Error opening #{args['<to_file>']}"
+  puts "Error: Could not open #{args['<to_file>']}"
   puts e.message
   exit(1)
 end
@@ -112,36 +112,41 @@ variables = args['<variables>'].split(',').map do |variable|
   rescue Errno::ENOENT => e 
     with_content = pairs[1]
   end
-  {"replace_string" => pairs[0], "with" => with_content }
+  {replace_string: pairs[0], with: with_content }
 end
 
+# Loop over each receipient, create a temporary template,
+# replace variables, and send the message
 to_addresses.each do |to_address|
   template_copy = String.new(template.to_inline_css)
   subject_copy = String.new(subject)
+  # Replace each variable in the template
   variables.each do |variable|
-    if variable['with'].kind_of?(Array)
-      sub_text = variable['with'].shift()
+    if variable[:with].kind_of?(Array)
+      sub_text = variable[:with].shift()
     else
-      sub_text = variable['with']
+      sub_text = variable[:with]
     end
-    template_copy.gsub!("{{#{variable['replace_string']}}}", sub_text)
-    subject_copy.gsub!("{{#{variable['replace_string']}}}", sub_text)
+    template_copy.gsub!("{{#{variable[:replace_string]}}}", sub_text)
+    subject_copy.gsub!("{{#{variable[:replace_string]}}}", sub_text)
   end
+  # Create the new mail object
   mail = Mail.new()
   mail.from = from_address
   mail.to = to_address
   mail.subject = subject_copy
-  mail.text_part do 
+  mail.text_part do
     body Nokogiri::HTML(template_copy).text
   end
   mail.html_part do
     content_type 'text/html; charset=UTF-8'
     body template_copy
   end
+  # Attach each file to the message
   begin
     attachments.each { |file| mail.add_file(file) } unless attachments.nil?
   rescue Exception => e
-    puts "Error attaching file"
+    puts 'Error: Could not attaching file'
     puts e.message
     exit(1)
   end
