@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Smitty::VERSION
   spec.authors       = ["Tom Steele"]
   spec.email         = ["thomasjsteele@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = %q{Send mail with handlebars like templates}
+  spec.summary       = %q{Send mail with handlebars like templates}
+  spec.homepage      = "https://github.com/tomsteele/smitty"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
