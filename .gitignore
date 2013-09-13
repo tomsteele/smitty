@@ -1,4 +1,5 @@
 *.gem
+.DS_Store
 *.hbs
 *.html
 *.txt
