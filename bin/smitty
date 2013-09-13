@@ -1,0 +1,154 @@
+#!/usr/bin/env ruby
+$:.unshift(File.join(File.dirname(__FILE__), "/../lib"))
+require "mail"
+require "docopt"
+require "nokogiri"
+require "premailer"
+require "smitty"
+
+doc = <<DOCOPT
+Smitty #{Smitty::VERSION}
+
+Usage:
+  #{$0} [options] <from_address> <to_file> <subject> <template> <variables>
+  #{$0} -h | --help
+  #{$0} -v | --version
+
+Required Arguments:
+  from_address:        Address to send mail from.
+  to_file:             Newline separated file containing recipient addresses.
+  subject:             Mail subject, can have handlebar replacements.
+  template:            Handlebar like HTML template.
+  variables:           Replacement variables for template and subject line,
+                       should be a comma separated list of key value pairs. Key
+                       should be the variable name in your template, and value may be
+                       a constant or a newline separated file. Value file and to_file
+                       must have the same amount of lines.
+
+Options:
+  -h --help            Show this usage.
+  -v --version         Show version.
+  -a files             Attach comma separated list of files.
+  --server SERVER      SMTP Server, default is localhost.
+  --port PORT          SMTP Port, default is 25.
+  --ssl                Use SSL, default is false.
+  --username USER      SMTP user.
+  --password PASSWORD  SMTP password.
+  --dry-run            Output messages and don't send.
+
+DOCOPT
+
+begin
+  args = Docopt::docopt(doc, {version: Smitty::VERSION})
+rescue Docopt::Exit => e
+  puts e.message
+  exit()
+end
+
+# Connect to the smtp server and set Mail default
+begin
+  # Default server is localhost and port is 25
+  smtp_server = args['--server'].nil? ? 'localhost' : args['--server']
+  smtp_port = args['--port'].nil? ? 25 : args['--port'].to_i
+  smtp_conn = Net::SMTP.new(smtp_server, smtp_port)
+  # Enable TLS
+  smtp_conn.enable_tls() if args['--ssl']
+  # Use authentication exit if username provided by no password
+  if args['--username']
+    if args['--password'].nil?
+      puts 'Error no password provided'
+      exit(1)
+    end
+    smtp_conn.start(smtp_server, args['--username'], args['--password'], :plain)
+  else
+    smtp_conn.start()
+  end
+  Mail.defaults do
+    delivery_method :smtp_connection, { :connection => smtp_conn }
+  end
+rescue Exception => e
+  puts "Error connecting to SMTP server #{smtp_server}:#{smtp_port}"
+  puts e.message
+  exit(1)
+end
+
+attachments = args['-a'].split(',') if args['-a']
+from_address = args['<from_address>']
+subject = args['<subject>']
+
+# Read to_file into list of addresses
+begin
+  to_addresses = File.readlines(args['<to_file>']).map(&:chomp)
+rescue Errno::ENOENT => e
+  puts "Error opening #{args['<to_file>']}"
+  puts e.message
+  exit(1)
+end
+
+# Read in template
+begin
+  template = Premailer.new(args['<template>'])
+rescue Errno::ENOENT => e
+  puts "Error opening #{args['<to_file>']}"
+  puts e.message
+  exit(1)
+end
+
+# Possible template variables
+# name=file.txt
+# name=constant
+variables = args['<variables>'].split(',').map do |variable|
+  pairs = variable.split('=')
+  # content is a file 
+  begin
+    with_content = File.readlines(pairs[1]).map(&:chomp)
+    # If to_addresses length does not equal with content length we don't have
+    # enough variables for each recepient
+    if with_content.length != to_addresses.length
+      puts "Error: #{pairs[0]} content length not equal to length of recipients"
+      exit(1)
+    end
+  # else it's a constant value
+  rescue Errno::ENOENT => e 
+    with_content = pairs[1]
+  end
+  {"replace_string" => pairs[0], "with" => with_content }
+end
+
+to_addresses.each do |to_address|
+  template_copy = String.new(template.to_inline_css)
+  subject_copy = String.new(subject)
+  variables.each do |variable|
+    if variable['with'].kind_of?(Array)
+      sub_text = variable['with'].shift()
+    else
+      sub_text = variable['with']
+    end
+    template_copy.gsub!("{{#{variable['replace_string']}}}", sub_text)
+    subject_copy.gsub!("{{#{variable['replace_string']}}}", sub_text)
+  end
+  mail = Mail.new()
+  mail.from = from_address
+  mail.to = to_address
+  mail.subject = subject_copy
+  mail.text_part do 
+    body Nokogiri::HTML(template_copy).text
+  end
+  mail.html_part do
+    content_type 'text/html; charset=UTF-8'
+    body template_copy
+  end
+  begin
+    attachments.each { |file| mail.add_file(file) } unless attachments.nil?
+  rescue Exception => e
+    puts "Error attaching file"
+    puts e.message
+    exit(1)
+  end
+  if args['--dry-run']
+    puts mail.to_s
+  else
+    puts "Message delivered to #{to_address}"
+    mail.deliver!
+  end
+end
