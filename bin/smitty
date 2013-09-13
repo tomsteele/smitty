@@ -10,9 +10,9 @@ doc = <<DOCOPT
 Smitty #{Smitty::VERSION}
 
 Usage:
-  #{$0} [options] <from_address> <to_file> <subject> <template> <variables>
-  #{$0} -h | --help
-  #{$0} -v | --version
+  #{__FILE__} [options] <from_address> <to_file> <subject> <template> <variables>
+  #{__FILE__} -h | --help
+  #{__FILE__} -v | --version
 
 Required Arguments:
   from_address:        Address to send mail from.
