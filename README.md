@@ -1,6 +1,6 @@
 # Smitty
 
-TODO: Write a gem description
+Smitty is a mail client that allows you to use handlebars like templates.
 
 ## Installation
 
@@ -14,11 +14,39 @@ And then execute:
 
 Or install it yourself as:
 
+    $ gem build smitty.gemspec
     $ gem install smitty
 
 ## Usage
 
-TODO: Write usage instructions here
+    Smitty 0.0.1
+
+    Usage:
+      ./smitty [options] <from_address> <to_file> <subject> <template> <variables>
+      ./smitty -h | --help
+      ./smitty -v | --version
+
+    Required Arguments:
+      from_address:        Address to send mail from.
+      to_file:             Newline separated file containing recipient addresses.
+      subject:             Mail subject, can have handlebar replacements.
+      template:            Handlebar like HTML template.
+      variables:           Replacement variables for template and subject line,
+                           should be a comma separated list of key value pairs. Key
+                           should be the variable name in your template, and value may be
+                           a constant or a newline separated file. Value file and to_file
+                           must have the same amount of lines.
+ 
+    Options:
+      -h --help            Show this usage.
+      -v --version         Show version.
+      -a files             Attach comma separated list of files.
+      --server SERVER      SMTP Server, default is localhost.
+      --port PORT          SMTP Port, default is 25.
+      --ssl                Use SSL, default is false.
+      --username USER      SMTP user.
+      --password PASSWORD  SMTP password.
+      --dry-run            Output messages and don't send.
 
 ## Contributing
 
