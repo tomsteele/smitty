@@ -58,6 +58,9 @@ to_addresses.each do |to_address|
     template_copy.gsub!("{{#{variable[:replace_string]}}}", sub_text)
     subject_copy.gsub!("{{#{variable[:replace_string]}}}", sub_text)
   end
+  Smitty.croak('A marker was found in template that did not have a matching key') if template_copy =~ /\{\{\w+\}\}/
+  Smitty.croak('A marker was found in the subject that did not have a matching key') if subject_copy =~ /\{\{\w+\}\}/
+  end
   # Create the new mail object
   mail = Mail.new()
   mail.from = from_address
