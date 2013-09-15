@@ -16,17 +16,17 @@ Required Arguments:
 Options:
   -h --help                        Show this usage.
   -v --version                     Show version.
-  --replace key=value,key=value    Replacement variables for template and subject line,
-                                   should be a comma separated list of key value pairs. Key
-                                   should be the variable name in your template, and value may be
-                                   a constant or a newline separated file. Value file and to_file
-                                   must have the same amount of lines.
+  --vars key=value,key=value       Variables for template and subject line, should be a comma separated
+                                   list of key value pairs. Key should be the variable name in your
+                                   template, and value may be a constant or a newline separated file.
+                                   Value file and to_file must have the same amount of lines.
   -a files                         Attach comma separated list of files.
   --server SERVER                  SMTP Server, default is localhost.
   --port PORT                      SMTP Port, default is 25.
   --ssl                            Use SSL, default is false.
   --username USER                  SMTP user.
   --password PASSWORD              SMTP password.
+  --cc address                     Add a cc address.
   --bcc address                    Add a bcc address.
   --dry-run                        Output messages and don't send.
 
