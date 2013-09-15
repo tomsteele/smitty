@@ -64,6 +64,7 @@ to_addresses.each do |to_address|
   mail.from = from_address
   mail.to = to_address
   mail.bcc = args['--bcc'] unless args['--bcc'].nil?
+  mail.cc = args['--cc'] unless args['--cc'].nil?
   mail.subject = subject_copy
   mail.text_part do
     body Nokogiri::HTML(template_copy).text
