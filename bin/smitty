@@ -19,7 +19,6 @@ smtp_conn = Smitty.smtp_connect(args['--server'], args['--port'], args['--ssl'],
 Mail.defaults do
   delivery_method :smtp_connection, { :connection => smtp_conn }
 end
-puts smtp_conn.to_s
 
 attachments = args['-a'].split(',') if args['-a']
 from_address = args['<from_address>']
