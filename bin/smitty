@@ -6,11 +6,12 @@ require 'nokogiri'
 require 'premailer'
 require 'smitty'
 
+# Parse arguments
 begin
   args = Docopt::docopt(Smitty::USAGE, {version: Smitty::VERSION})
 rescue Docopt::Exit => e
   puts e.message
-  exit()
+  exit(0)
 end
 
 # Connect to the smtp server and set Mail default
@@ -23,10 +24,7 @@ begin
   smtp_conn.enable_tls() if args['--ssl']
   # Use authentication exit if username provided but no password
   if args['--username']
-    if args['--password'].nil?
-      puts 'Error: No password provided'
-      exit(1)
-    end
+    Smitty.croak('No password provided') if args['--password'].nil?
     smtp_conn.start(smtp_server, args['--username'], args['--password'], :plain)
   else
     smtp_conn.start()
@@ -35,9 +33,7 @@ begin
     delivery_method :smtp_connection, { :connection => smtp_conn }
   end
 rescue Exception => e
-  puts "Error: Could not connect to SMTP server #{smtp_server}:#{smtp_port}"
-  puts e.message
-  exit(1)
+  Smitty.croak("Could not connect to SMTP server #{smtp_server}:#{smtp_port}", e.message)
 end
 
 attachments = args['-a'].split(',') if args['-a']
@@ -48,18 +44,14 @@ subject = args['<subject>']
 begin
   to_addresses = File.readlines(args['<to_file>']).map(&:chomp)
 rescue Errno::ENOENT => e
-  puts "Error opening #{args['<to_file>']}"
-  puts e.message
-  exit(1)
+  Smitty.croak("Count not open #{args['<to_file>']}", e.message)
 end
 
 # Read in template
 begin
   template = Premailer.new(args['<template>'])
 rescue Errno::ENOENT => e
-  puts "Error: Could not open #{args['<to_file>']}"
-  puts e.message
-  exit(1)
+  Smitty.croak("Could not open #{args['<to_file>']}", e.message)
 end
 
 # Possible template variables
@@ -72,10 +64,7 @@ variables = args['--replace'].split(',').map do |variable|
     with_content = File.readlines(pairs[1]).map(&:chomp)
     # If to_addresses length does not equal with content length we don't have
     # enough variables for each recipient
-    if with_content.length != to_addresses.length
-      puts "Error: #{pairs[0]} content length not equal to length of recipients"
-      exit(1)
-    end
+    Smitty.croak("#{pairs[0]} content length not equal to recipients") if with_content.length != to_addresses.length
   # else it's a constant value
   rescue Errno::ENOENT => e 
     with_content = pairs[1]
@@ -115,9 +104,7 @@ to_addresses.each do |to_address|
   begin
     attachments.each { |file| mail.add_file(file) } unless attachments.nil?
   rescue Exception => e
-    puts 'Error: Could not attaching file'
-    puts e.message
-    exit(1)
+    Smitty.croak('Could not attach file', e.message)
   end
   if args['--dry-run']
     puts mail.to_s
