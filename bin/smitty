@@ -60,7 +60,6 @@ to_addresses.each do |to_address|
   end
   Smitty.croak('A marker was found in template that did not have a matching key') if template_copy =~ /\{\{\w+\}\}/
   Smitty.croak('A marker was found in the subject that did not have a matching key') if subject_copy =~ /\{\{\w+\}\}/
-  end
   # Create the new mail object
   mail = Mail.new()
   mail.from = from_address
