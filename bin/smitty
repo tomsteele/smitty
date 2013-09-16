@@ -40,8 +40,7 @@ end
 
 # Parse replacement variables, exiting if length is not equal to to_file
 variables = []
-variables = args['--vars'].split(',').map(&:Smitty.variable_parser) unless args['--vars'].nil?
-variables.each { |var| croak("#{var[:replace_string]} != recipient length") if var[:with].length != to_addresses}
+variables = args['--vars'].split(',').map { |var| Smitty.variable_parser(var, to_addresses.length) } unless args['--vars'].nil?
 
 # Loop over each receipient, create a temporary template,
 # replace variables, and send the message
