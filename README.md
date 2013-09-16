@@ -1,18 +1,22 @@
 # Smitty
 
-Smitty is a mail client that allows you to use handlebars like templates.
+Smitty is a mail client that allows you to use handlebars like HTML templates. It supports all the things you would expect out a mail client. Internally it uses [mail](https://github.com/mikel/mail) for creation and [premailer](https://github.com/alexdunae/premailer/) for inline css. Generation for Multi-Part messages is all done for you.
+
+Smitty doesn't use everything that is available in handlebars, it only does replacement for variables. What this allows you to do is create nice looking HTML templates in a proper editor, and then do quick search and replace. 
+
+For example, say you wanted to loop over a set of emails and names, inserting a different name for the corresponding email. In your template, you would put {{name}} in the place where you wanted replacement to occur, write your names and email addresses in 'names.txt' and 'emails.txt' respectively, and call smitty like so. Assume your template is in template.hbs.
+
+    ./smitty from@someplace.io emails.txt 'YO {{name}}' template.hbs --vars 'name=names.txt' 
+    
+Smitty would then loop over each email address in emails.txt, replacing {{name}} with the corresponding name from names.txt. As you can see, variable names in the subject is also supported.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Download the latest gem [here](https://github.com/tomsteele/smitty/releases/download/v0.0.2/smitty-0.0.2.gem) and install with gem:
 
-    gem 'smitty'
+    $ gem install smitty
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Or build and install it yourself as:
 
     $ gem build smitty.gemspec
     $ gem install smitty
