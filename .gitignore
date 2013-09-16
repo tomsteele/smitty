@@ -1,3 +1,4 @@
+*.css
 *.gem
 .DS_Store
 *.hbs
