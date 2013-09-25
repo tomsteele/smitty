@@ -12,8 +12,6 @@ Smitty would then loop over each email address in emails.txt, replacing {{name}}
 
 ## Installation
 
-Download the latest gem [here](https://github.com/tomsteele/smitty/releases/download/v0.0.2/smitty-0.0.2.gem) and install with gem:
-
     $ gem install smitty
 
 Or build and install it yourself as:
