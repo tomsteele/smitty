@@ -82,7 +82,12 @@ to_addresses.each do |to_address|
   if args['--dry-run']
     puts mail.to_s
   else
-    puts "Message delivered to #{to_address}"
-    mail.deliver!
+    puts "Sending message to #{to_address}"
+    begin
+      mail.deliver!
+      puts "Message sent"
+    rescue Exception => e
+      puts "Error: #{e.message}"
+    end
   end
 end
