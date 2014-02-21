@@ -5,6 +5,7 @@ require 'docopt'
 require 'nokogiri'
 require 'premailer'
 require 'smitty'
+require 'securerandom'
 
 # Parse arguments
 begin
@@ -23,6 +24,8 @@ end
 attachments = args['-a'].split(',') if args['-a']
 from_address = args['<from_address>']
 subject = args['<subject>']
+message_id_fqdn = from_address.split('@')[1]
+message_id_fqdn = args['-messageid'] if args['-messageid']
 
 # Read to_file into list of addresses
 begin
@@ -66,6 +69,7 @@ to_addresses.each do |to_address|
   mail.bcc = args['--bcc'] unless args['--bcc'].nil?
   mail.cc = args['--cc'] unless args['--cc'].nil?
   mail.subject = subject_copy
+  mail.message_id = "<#{SecureRandom.hex(8)}.#{SecureRandom.hex(8)}@#{message_id_fqdn}>"
   mail.text_part do
     body Nokogiri::HTML(template_copy).text
   end

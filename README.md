@@ -21,7 +21,7 @@ Or build and install it yourself as:
 
 ## Usage
 
-    Smitty 0.0.2
+    Smitty 0.0.4
 
     Usage:
       ./smitty [options] <from_address> <to_file> <subject> <template>
@@ -49,6 +49,7 @@ Or build and install it yourself as:
       --password PASSWORD              SMTP password.
       --cc address                     Add a cc address.
       --bcc address                    Add a bcc address.
+      --messageid FQDN                 Set a FQDN to use when generating the message-id for each message.
       --dry-run                        Output messages and don't send.
 
 ## Contributing

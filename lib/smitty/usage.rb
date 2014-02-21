@@ -28,6 +28,7 @@ Options:
   --password PASSWORD              SMTP password.
   --cc address                     Add a cc address.
   --bcc address                    Add a bcc address.
+  --messageid FQDN                 Set a FQDN to use when generating the message-id for each message.
   --dry-run                        Output messages and don't send.
 
 DOC
