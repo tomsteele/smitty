@@ -50,6 +50,8 @@ variables = args['--vars'].split(',').map { |var| Smitty.variable_parser(var, to
 to_addresses.each do |to_address|
   template_copy = String.new(template.to_inline_css)
   subject_copy = String.new(subject)
+  template_copy.gsub!('%7B%7B', '{{')  
+  template_copy.gsub!('%7D%7D', '}}')
   # Replace each variable in the template
   variables.each do |variable|
     if variable[:with].kind_of?(Array)
