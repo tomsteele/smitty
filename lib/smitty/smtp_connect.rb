@@ -6,10 +6,14 @@ module Smitty
       smtp_server = server.nil? ? 'localhost' : server
       smtp_port = port.nil? ? 25 : port.to_i
       smtp_conn = Net::SMTP.new(smtp_server, smtp_port)
-      smtp_conn.enable_tls() if ssl
+      smtp_conn.enable_starttls() if ssl
       if username
         Smitty.croak('No password provided') if password.nil?
-        smtp_conn.start(smtp_server, username, password, :plain)
+        if ssl
+          smtp_conn.start(smtp_server, username, password, :login)
+        else
+          smtp_conn.start(smtp_server, username, password, :plain)
+        end
       else
         smtp_conn.start()
       end
