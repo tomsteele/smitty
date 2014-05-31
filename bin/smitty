@@ -23,7 +23,7 @@ end
 
 attachments = args['-a'].split(',') if args['-a']
 from_address = args['<from_address>']
-match_address = /[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/.match(from_address).to_s
+match_address = /[-0-9a-z.+_]+@[-0-9a-z.+_]+\.[a-z]{2,}/i.match(from_address).to_s
 subject = args['<subject>']
 message_id_fqdn = match_address.split('@')[1]
 message_id_fqdn = args['-messageid'] if args['-messageid']
