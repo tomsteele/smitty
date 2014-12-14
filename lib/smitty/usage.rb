@@ -30,6 +30,7 @@ Options:
   --cc address                     Add a cc address.
   --bcc address                    Add a bcc address.
   --messageid FQDN                 Set a FQDN to use when generating the message-id for each message.
+  --sleep SEC                      Sets sleep delay, in seconds, per each recipent.
   --dry-run                        Output messages and don't send.
 
 DOC
