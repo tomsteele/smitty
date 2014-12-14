@@ -82,7 +82,15 @@ to_addresses.each do |to_address|
   end
   # Attach each file to the message
   begin
-    attachments.each { |file| mail.add_file(file) } unless attachments.nil?
+    attachments.each { |file| 
+      mail.add_file(file) 
+      if  args['--cid']
+        file.sub!(/.*?\/(\w+\.\w{3})$/, '\1')
+        image = mail.attachments[file]
+        template_copy.gsub!("{{#{file}}}", image.cid)
+        subject_copy.gsub!("{{#{file}}}", image.cid)
+      end 
+    } unless attachments.nil?
   rescue Exception => e
     Smitty.croak('Could not attach file', e.message)
   end
