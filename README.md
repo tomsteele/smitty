@@ -10,6 +10,14 @@ For example, say you wanted to loop over a set of emails and names, inserting a 
     
 Smitty would then loop over each email address in emails.txt, replacing {{name}} with the corresponding name from names.txt. As you can see, variable names in the subject is also supported.
 
+## Content-ID Embeded Images
+
+Smitty includes the abilty to generate Content-ID values for attached images and embed the content within the handlebars HTML template in accorance with [RFC2557](http://tools.ietf.org/html/rfc2557#page-8).Smitty will generate a Multi-Part email message and search the handlebar HTML template for image references associated with the attached image name.
+
+    ./smitty from@someplace.io emails.txt 'Subject' -a someimage.jpg --cid tempalte.hbs
+
+Smitty will then search through the template and replace references to \<IMG SRC="cid:{{someimage.jpg}}"\> with the Content-ID value of the attached image.
+
 ## Installation
 
     $ gem install smitty
@@ -21,12 +29,12 @@ Or build and install it yourself as:
 
 ## Usage
 
-    Smitty 0.0.4
+    Smitty 0.0.5
 
     Usage:
-      ./smitty [options] <from_address> <to_file> <subject> <template>
-      ./smitty -h | --help
-      ./smitty -v | --version
+      smitty [options] <from_address> <to_file> <subject> <template>
+      smitty -h | --help
+      smitty -v | --version
 
     Required Arguments:
       from_address:                    Address to send mail from.
@@ -42,6 +50,7 @@ Or build and install it yourself as:
                                        template, and value may be a constant or a newline separated file.
                                        Value file and to_file must have the same amount of lines.
       -a files                         Attach comma separated list of files.
+      --cid                            Enable CID embeding of images for email attachments, default is false.
       --server SERVER                  SMTP Server, default is localhost.
       --port PORT                      SMTP Port, default is 25.
       --ssl                            Use SSL, default is false.
@@ -50,6 +59,7 @@ Or build and install it yourself as:
       --cc address                     Add a cc address.
       --bcc address                    Add a bcc address.
       --messageid FQDN                 Set a FQDN to use when generating the message-id for each message.
+      --sleep SEC                      Sets sleep delay, in seconds, per each recipent.
       --dry-run                        Output messages and don't send.
 
 ## Contributing

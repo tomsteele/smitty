@@ -21,6 +21,7 @@ Options:
                                    template, and value may be a constant or a newline separated file.
                                    Value file and to_file must have the same amount of lines.
   -a files                         Attach comma separated list of files.
+  --cid                            Enable CID embeding of images for email attachments, default is false.
   --server SERVER                  SMTP Server, default is localhost.
   --port PORT                      SMTP Port, default is 25.
   --ssl                            Use SSL, default is false.
@@ -29,6 +30,7 @@ Options:
   --cc address                     Add a cc address.
   --bcc address                    Add a bcc address.
   --messageid FQDN                 Set a FQDN to use when generating the message-id for each message.
+  --sleep SEC                      Sets sleep delay, in seconds, per each recipent.
   --dry-run                        Output messages and don't send.
 
 DOC

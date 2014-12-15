@@ -27,6 +27,7 @@ match_address = /[-0-9a-z.+_]+@[-0-9a-z.+_]+\.[a-z]{2,}/i.match(from_address).to
 subject = args['<subject>']
 message_id_fqdn = match_address.split('@')[1]
 message_id_fqdn = args['-messageid'] if args['-messageid']
+sleep = args['--sleep'] unless args['--sleep'].nil?
 
 # Read to_file into list of addresses
 begin
@@ -82,7 +83,15 @@ to_addresses.each do |to_address|
   end
   # Attach each file to the message
   begin
-    attachments.each { |file| mail.add_file(file) } unless attachments.nil?
+    attachments.each { |file| 
+      mail.add_file(file) 
+      if  args['--cid']
+        file.sub!(/.*?\/(\w+\.\w{3})$/, '\1')
+        image = mail.attachments[file]
+        template_copy.gsub!("{{#{file}}}", image.cid)
+        subject_copy.gsub!("{{#{file}}}", image.cid)
+      end 
+    } unless attachments.nil?
   rescue Exception => e
     Smitty.croak('Could not attach file', e.message)
   end
@@ -93,6 +102,10 @@ to_addresses.each do |to_address|
     begin
       mail.deliver!
       puts "Message sent"
+      if defined?(sleep) && !to_address.equal?(to_addresses.last)
+        puts "Sleeping for #{sleep} seconds"
+        sleep(sleep.to_i)
+      end
     rescue Exception => e
       puts "Error: #{e.message}"
     end
