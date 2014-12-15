@@ -29,7 +29,7 @@ Or build and install it yourself as:
 
 ## Usage
 
-    Smitty 0.0.5
+    Smitty 1.0.0
 
     Usage:
       smitty [options] <from_address> <to_file> <subject> <template>
