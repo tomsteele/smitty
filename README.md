@@ -16,7 +16,7 @@ Smitty includes the abilty to generate Content-ID values for attached images and
 
     ./smitty from@someplace.io emails.txt 'Subject' -a someimage.jpg --cid tempalte.hbs
 
-Smitty will then search through the template and replace references to \<IMG SRC="cid:{{someimage}}"\> with the Content-ID value of the attached image.
+Smitty will then search through the template and replace references to \<IMG SRC="cid:{{someimage.jpg}}"\> with the Content-ID value of the attached image.
 
 ## Installation
 
