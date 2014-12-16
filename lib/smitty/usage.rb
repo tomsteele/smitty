@@ -21,7 +21,7 @@ Options:
                                    template, and value may be a constant or a newline separated file.
                                    Value file and to_file must have the same amount of lines.
   -a files                         Attach comma separated list of files.
-  --cid                            Enable CID embeding of images for email attachments, default is false.
+  --cid                            Enable CID embedding of images for email attachments, default is false.
   --server SERVER                  SMTP Server, default is localhost.
   --port PORT                      SMTP Port, default is 25.
   --ssl                            Use SSL, default is false.
