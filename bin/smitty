@@ -74,17 +74,22 @@ to_addresses.each do |to_address|
   mail.cc = args['--cc'] unless args['--cc'].nil?
   mail.subject = subject_copy
   mail.message_id = "<#{SecureRandom.hex(8)}.#{SecureRandom.hex(8)}@#{message_id_fqdn}>"
-  mail.text_part do
-    body Nokogiri::HTML(template_copy).text
+
+  bodypart = Mail::Part.new do
+    text_part do
+      body Nokogiri::HTML(template_copy).text
+    end
+    html_part do
+      content_type 'text/html; charset=UTF-8'
+      body template_copy
+    end
   end
-  mail.html_part do
-    content_type 'text/html; charset=UTF-8'
-    body template_copy
-  end
+  mail.add_part bodypart
+
   # Attach each file to the message
   begin
-    attachments.each { |file| 
-      mail.add_file(file) 
+    attachments.each { |file|
+      mail.add_file(file)
       if  args['--cid']
         file.sub!(/.*?\/(\w+\.\w{3})$/, '\1')
         image = mail.attachments[file]
