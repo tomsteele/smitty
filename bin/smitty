@@ -52,7 +52,7 @@ variables = args['--vars'].split(',').map { |var| Smitty.variable_parser(var, to
 to_addresses.each do |to_address|
   template_copy = String.new(template.to_inline_css)
   subject_copy = String.new(subject)
-  template_copy.gsub!('%7B%7B', '{{')  
+  template_copy.gsub!('%7B%7B', '{{')
   template_copy.gsub!('%7D%7D', '}}')
   # Replace each variable in the template
   variables.each do |variable|
@@ -75,6 +75,26 @@ to_addresses.each do |to_address|
   mail.subject = subject_copy
   mail.message_id = "<#{SecureRandom.hex(8)}.#{SecureRandom.hex(8)}@#{message_id_fqdn}>"
 
+  # Attach each file to the message
+  begin
+    attachments.each { |file|
+      # Define custom ID value for attached image
+      a_fqdn = match_address.split('@')[1]
+      a_fqdn = args['-messageid'] if args['-messageid']
+      a_id = "<#{SecureRandom.hex(8)}.#{SecureRandom.hex(8)}@#{a_fqdn}>"
+      mail.attachments[file] = {:content => File.read(file),
+                                :content_id => a_id}
+      if  args['--cid']
+        file.sub!(/.*?\/(\w+\.\w{3})$/, '\1')
+        image = mail.attachments[file]
+        template_copy.gsub!("{{#{file}}}", image.cid)
+        subject_copy.gsub!("{{#{file}}}", image.cid)
+      end
+    } unless attachments.nil?
+  rescue Exception => e
+    Smitty.croak('Could not attach file', e.message)
+  end
+  
   bodypart = Mail::Part.new do
     text_part do
       body Nokogiri::HTML(template_copy).text
@@ -86,20 +106,6 @@ to_addresses.each do |to_address|
   end
   mail.add_part bodypart
 
-  # Attach each file to the message
-  begin
-    attachments.each { |file|
-      mail.add_file(file)
-      if  args['--cid']
-        file.sub!(/.*?\/(\w+\.\w{3})$/, '\1')
-        image = mail.attachments[file]
-        template_copy.gsub!("{{#{file}}}", image.cid)
-        subject_copy.gsub!("{{#{file}}}", image.cid)
-      end 
-    } unless attachments.nil?
-  rescue Exception => e
-    Smitty.croak('Could not attach file', e.message)
-  end
   if args['--dry-run']
     puts mail.to_s
   else
