@@ -54,7 +54,7 @@ Or build and install it yourself as:
       --server SERVER                  SMTP Server, default is localhost.
       --port PORT                      SMTP Port, default is 25.
       --ssl                            Use SSL, default is false.
-  --ignorecert                     Ignore the SMTP server certificate when using --ssl.
+      --ignorecert                     Ignore the SMTP server certificate when using --ssl.
       --username USER                  SMTP user.
       --password PASSWORD              SMTP password.
       --cc address                     Add a cc address.
