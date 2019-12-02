@@ -16,7 +16,7 @@ rescue Docopt::Exit => e
 end
 
 # Create SMTP connection and set Mail default
-smtp_conn = Smitty.smtp_connect(args['--server'], args['--port'], args['--ssl'], args['--username'], args['--password'])
+smtp_conn = Smitty.smtp_connect(args['--server'], args['--port'], args['--ssl'], args['--username'], args['--password'], args['--ignorecert'])
 Mail.defaults do
   delivery_method :smtp_connection, { :connection => smtp_conn }
 end
